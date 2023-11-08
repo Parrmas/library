@@ -15,6 +15,14 @@ curl_setopt($client, CURLOPT_RETURNTRANSFER,true);
 $response = curl_exec($client);
 
 $categories = json_decode($response);
+
+include 'api/connection.php';
+$books_in_ea_cate = array();
+$query = "SELECT category_id, COUNT(id) as amount FROM Books GROUP BY category_id";
+$result = $db->query($query) or die("Error at: " . $db->error);
+while ($row = mysqli_fetch_assoc($result)){
+    $books_in_ea_cate[$row['category_id']] = $row['amount'];
+}
 ?>
 <?php include 'head.php'; ?>
 <main>
@@ -72,19 +80,19 @@ $categories = json_decode($response);
                         <input id="search-input" type="text" class="form-control" oninput="search_categories()" placeholder="Search..."/>
                     </div>
                 </div>
-                <table class="table">
+                <table class="table" style="width: 100%">
                     <tr>
-                        <th>ID</th>
-                        <th>name</th>
-                        <th></th>
+                        <th style="width: 50%; text-align: center">Name</th>
+                        <th style="width: 50%; text-align: center">Number of Books</th>
+                        <th>Action</th>
                     </tr>
                     <tbody id="categories-list">
                     <?php foreach ($categories as $row): ?>
                         <tr>
-                            <td style="font-size: 20px; vertical-align: middle"><?= $row->id ?></td>
-                            <td style="font-size: 20px; vertical-align: middle"><?= $row->name ?></td>
-                            <td>
-                                <form method="POST" action="api/api_categories.php">
+                            <td style="font-size: 20px; vertical-align: middle; text-align: center"><?= $row->name ?></td>
+                            <td style="font-size: 20px; vertical-align: middle; text-align: center;"><?= $books_in_ea_cate[$row->id] ?></td>
+                            <td style="display: flex; justify-content: flex-end;">
+                                <form method="POST" action="api/api_categories.php" style="display: inline-flex; justify-content: flex-end">
                                     <button class="btn btn-primary btn-edit"
                                             data-id="<?= $row->id; ?>"
                                             data-name="<?= $row->name; ?>"

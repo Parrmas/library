@@ -13,26 +13,26 @@
     <div class="container-fluid px-4">
         <h1 class="mt-4">Quản lý thư viện Pạt's Lib </h1>
         <ol class="breadcrumb mb-4">
-            <li class="breadcrumb-item active" style="font-size: 30px">Quản lý đọc giả</li>
+            <li class="breadcrumb-item active" style="font-size: 30px">Quản lý độc giả</li>
         </ol>
         <!--Add section-->
         <div class="card mb-4">
             <div class="card-header">
                 <i class="fas fa-table me-1"></i>
-                Thêm đọc giả mới
+                Thêm độc giả mới
             </div>
             <div class="card-body">
                 <form method="POST" action="api/api_readers.php">
                     <div class="form-floating mb-3">
                         <input class="form-control" id="inputName" type="text" placeholder="" name="name" required />
-                        <label for="inputName">Tên đọc giả</label>
+                        <label for="inputName">Tên độc giả</label>
                     </div>
                     <div class="form-floating mb-3">
-                        <input class="form-control" id="inputEmail" type="text" placeholder="" name="email" required />
+                        <input class="form-control" id="inputEmail" type="text" placeholder="" name="email" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" required />
                         <label for="inputEmail">Email</label>
                     </div>
                     <div class="form-floating mb-3">
-                        <input class="form-control" id="inputPhone" type="text" placeholder="" name="phone" required />
+                        <input class="form-control" id="inputPhone" type="text" placeholder="" name="phone" pattern="[0-9]{10}" required />
                         <label for="inputPhone">Số điện thoại</label>
                     </div>
                     <div class="d-flex align-items-center justify-content-between mt-4 mb-0">
@@ -82,16 +82,14 @@
                 </div>
                 <table class="table">
                     <tr>
-                        <th>ID</th>
-                        <th>name</th>
-                        <th>email</th>
-                        <th>phone</th>
+                        <th>Tên độc giả</th>
+                        <th>Email</th>
+                        <th>Số điện thoại</th>
                         <th></th>
                     </tr>
                     <tbody id="readers-list">
-                    <?php foreach ($categories as $row): ?>
+                    <?php foreach ($readers as $row): ?>
                         <tr>
-                            <td style="font-size: 20px; vertical-align: middle"><?= $row->id ?></td>
                             <td style="font-size: 20px; vertical-align: middle"><?= $row->name ?></td>
                             <td style="font-size: 20px; vertical-align: middle"><?= $row->email ?></td>
                             <td style="font-size: 20px; vertical-align: middle"><?= $row->phone ?></td>
@@ -113,6 +111,7 @@
                 </table>
             </div>
         </div>
+    </div>
 </main>
 <script>
     $(function(){

@@ -1,0 +1,4 @@
+RewriteEngine On    # Turn on the rewriting engine
+
+RewriteRule ^api_getBooksByCategory/([0-9a-zA-Z_-]*)$ api_getBooksByCategory.php?category_id=$1 [NC,L]
+

@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         </style>
     </head>
-    <body class="bg-primary">
+    <body class="bg-custom">
         <div id="layoutAuthentication">
             <div id="layoutAuthentication_content">
                 <main>

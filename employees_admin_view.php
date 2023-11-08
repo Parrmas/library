@@ -36,7 +36,7 @@
                         <label for="inputName">Tên nhân viên</label>
                     </div>
                     <div class="form-floating mb-3">
-                        <input class="form-control" id="inputEmail" type="text" placeholder="" name="email" required />
+                        <input class="form-control" id="inputEmail" type="text" placeholder="" name="email" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" required />
                         <label for="inputEmail">Email</label>
                     </div>
                     <div class="form-floating mb-3">
@@ -44,7 +44,7 @@
                         <label for="inputPassword">Mật khẩu</label>
                     </div>
                     <div class="form-floating mb-3">
-                        <input class="form-control" id="inputPhone" type="text" placeholder="" name="phone" required />
+                        <input class="form-control" id="inputPhone" type="text" placeholder="" name="phone" pattern="[0-9]{10}" required />
                         <label for="inputPhone">Số điện thoại</label>
                     </div>
                     <div class="d-flex align-items-center justify-content-between mt-4 mb-0">
@@ -98,17 +98,15 @@
                 </div>
                 <table class="table">
                     <tr>
-                        <th>ID</th>
-                        <th>name</th>
-                        <th>email</th>
-                        <th>password</th>
-                        <th>phone</th>
+                        <th>Tên nhân viên</th>
+                        <th>Email</th>
+                        <th>Mật khẩu</th>
+                        <th>Số điện thoại</th>
                         <th></th>
                     </tr>
                     <tbody id="employees-list">
-                    <?php foreach ($categories as $row): ?>
+                    <?php foreach ($employees as $row): ?>
                         <tr>
-                            <td style="font-size: 20px; vertical-align: middle"><?= $row->id ?></td>
                             <td style="font-size: 20px; vertical-align: middle"><?= $row->name ?></td>
                             <td style="font-size: 20px; vertical-align: middle"><?= $row->email ?></td>
                             <td style="font-size: 20px; vertical-align: middle"><?= $row->password ?></td>

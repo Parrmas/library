@@ -101,17 +101,18 @@
                 }
             }
 
-            //Build query
-            $query = "INSERT INTO Books (name, author, category_id, isbn, avail_copy, img) 
-                    VALUES ('$name', '$author', '$category_id', '$isbn', '$avail_copy', '$img')";
+            $stmt = $db->prepare("INSERT INTO Books (name, author, category_id, isbn, avail_copy, img) VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("ssisss", $name, $author, $category_id, $isbn, $avail_copy, $img);
 
-            //Run query
-            $result = $db->query($query) or die("Error at: " . $db->error);
+            $result = $stmt->execute();
+
             $db->close();
 
-            //return response for checking
-            //echo json_encode($response);
-            header('Location:../books_admin_view.php');
+            if ($result) {
+                header('Location:../books_admin_view.php');
+            } else {
+                die("Error: " . $stmt->error);
+            }
         }
         if (isset($_POST['edit'])) {
             // Edit existing record
@@ -167,26 +168,24 @@
                 }
             }
 
-            // Build and run the query to update the record (including image update if applicable)
-            $query = "UPDATE Books SET name = '$name', author = '$author', category_id = '$category_id', isbn = '$isbn', avail_copy = '$avail_copy'";
+            // Assuming $db is your MySQLi connection
+            $stmt = $db->prepare("UPDATE Books SET name = ?, author = ?, category_id = ?, isbn = ?, avail_copy = ? WHERE id = ?");
+            $stmt->bind_param("ssisii", $name, $author, $category_id, $isbn, $avail_copy, $id);
 
-            // Add image URL update if applicable
             if (isset($img)) {
-                $query .= ", img = '$img'";
+                $stmt->prepare("UPDATE Books SET img = ? WHERE id = ?");
+                $stmt->bind_param("si", $img, $id);
             }
 
-            $query .= " WHERE id = $id";
+            $result = $stmt->execute();
 
-            // Run query
-            $result = $db->query($query) or die("Error at: " . $db->error);
-            $db->close();
-
-            // Return a response indicating success or failure
             if ($result) {
                 echo json_encode(['message' => 'Record updated successfully']);
             } else {
                 echo json_encode(['message' => 'Failed to update record']);
             }
+
+            $db->close();
 
             header('Location:../books_admin_view.php');
         }
@@ -194,9 +193,10 @@
             // Edit existing record
             $id = $_POST['id'];
 
-            $query = "DELETE FROM * WHERE id = '$id'";
+            $query = "DELETE FROM Books WHERE id = '$id'";
             $result = $db->query($query) or die("Error at: " . $db->error);
             $db->close();
+            header('Location: ../books_admin_view.php');
         }
     }
 ?>

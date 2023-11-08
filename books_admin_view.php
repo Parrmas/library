@@ -16,6 +16,7 @@
     $response = curl_exec($client);
 
     $books = json_decode($response);
+    $booksJson = json_encode($books);
 
     //Get all categories
     $url = 'http://vutt94.io.vn/library/api/api_categories.php';
@@ -56,6 +57,7 @@
                                 <option value="<?=$row->id;?>"><?=$row->name;?></option>
                             <?php endforeach; ?>
                         </select>
+                        <label for="inputCategory">Chủ đề</label>
                     </div>
                     <div class="form-floating mb-3">
                         <input class="form-control" id="inputISBN" type="text" placeholder="" name="isbn" required />
@@ -130,26 +132,24 @@
                 </div>
                 <table class="table">
                     <tr>
-                        <th>ID</th>
-                        <th>name</th>
-                        <th>author</th>
-                        <th>category_name</th>
-                        <th>isbn</th>
-                        <th>avail_copy</th>
-                        <th style="text-align: center">img</th>
-                        <th></th>
+                        <th style="text-align: center">Book Cover</th>
+                        <th>Name</th>
+                        <th>Author</th>
+                        <th>Category</th>
+                        <th>ISBN</th>
+                        <th>Available Copy</th>
+                        <th>Action</th>
                     </tr>
                     <tbody id="books-list">
                     <?php foreach ($books as $row): ?>
                         <tr>
-                            <td style="font-size: 20px; vertical-align: middle"><?= $row->id ?></td>
+                            <td style="text-align: center"><img src="api/images/<?= $row->img ?>" height="250px" width="250px" style="object-fit: contain"/></td>
                             <td style="font-size: 20px; vertical-align: middle"><?= $row->name ?></td>
                             <td style="font-size: 20px; vertical-align: middle"><?= $row->author ?></td>
                             <td style="font-size: 20px; vertical-align: middle"><?= $row->category_name ?></td>
                             <td style="font-size: 20px; vertical-align: middle"><?= $row->isbn ?></td>
-                            <td style="font-size: 20px; vertical-align: middle"><?= $row->avail_copy ?></td>
-                            <td style="text-align: center"><img src="api/images/<?= $row->img ?>" height="100px" width="auto"/></td>
-                            <td>
+                            <td style="font-size: 20px; vertical-align: middle; text-align: center"><?= $row->avail_copy ?></td>
+                            <td style="vertical-align: middle; horiz-align: right">
                                 <form id="formAdd" method="POST" action="api/api_books.php">
                                     <button class="btn btn-primary btn-edit"
                                             data-id="<?= $row->id; ?>"
@@ -189,5 +189,45 @@
             $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
         });
     };
+    $(function(){
+        $("#buttonAdd").click(function(){
+            event.preventDefault();
+            var isbn = $("#inputISBN").val();
+            var regex = /^97(8|9)[-\d]{10}\d$/;
+            if (!regex.test(isbn)) {
+                $("#inputISBN")[0].setCustomValidity('Invalid ISBN-13 code');
+                $("#inputISBN")[0].reportValidity();
+            } else {
+                var books = <?php echo $booksJson; ?>;
+                var isbnExists = books.some(function(book) {
+                    return book.isbn === isbn;
+                });
+                if (isbnExists) {
+                    $("#inputISBN")[0].setCustomValidity('ISBN already exists');
+                    $("#inputISBN")[0].reportValidity();
+                }
+            }
+        });
+        $("#buttonUpdate").click(function(){
+            event.preventDefault();
+            var isbn = $("#inputISBNUpdate").val();
+            var regex = /^97(8|9)[-\d]{10}\d$/;
+            if (!regex.test(isbn)) {
+                $("#inputISBNUpdate")[0].setCustomValidity('Invalid ISBN-13 code');
+                $("#inputISBNUpdate")[0].reportValidity();
+            } else {
+                var books = <?php echo $booksJson; ?>;
+                var isbnExists = books.some(function(book) {
+                    return book.isbn === isbn;
+                });
+                if (isbnExists) {
+                    $("#inputISBNUpdate")[0].setCustomValidity('ISBN already exists');
+                    $("#inputISBNUpdate")[0].reportValidity();
+                } else {
+                    $("#buttonAdd").closest('form').submit();
+                }
+            }
+        });
+    });
 </script>
 <?php include 'foot.php'?>

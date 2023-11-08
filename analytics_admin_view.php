@@ -60,28 +60,46 @@ if (!isset($_SESSION['admin'])) {
         </ol>
         <div class="row">
             <div class="col-md-4">
-                <div class="card" style="border: 1px solid #e0e0e0; border-radius: 10px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); background-color: lightblue">
+                <div class="card" style="height: 220px; border: 1px solid #e0e0e0; border-radius: 10px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); background-color: lightblue">
                     <div class="card-body">
-                        <h3 class="card-title" style="font-size: 1.5rem; font-weight: bold;">Number of Books</h3>
-                        <p class="card-text" style="font-size: 90px;"><?php echo $totalBooks; ?></p>
+                        <div style="float: left; width: 50%; padding-left: 30px">
+                            <p class="card-text" style="font-size: 70px;"><?php echo $totalBooks; ?></p>
+                            <p class="card-text" style="font-size: 30px;">Books</p>
+                        </div>
+                        <div style=" display: flex; width: 50%; height: 100%; align-items: center; justify-content: flex-end">
+                            <i class="fas fa-book" style="max-width: 50%; height: auto; opacity: 0.6"></i> <!-- Replace 'book_icon.png' with the path to your book icon image -->
+                        </div>
+                        <div style="clear: both;"></div> <!-- This div is used to clear the float, preventing it from affecting elements outside of the card -->
                     </div>
                 </div>
             </div>
 
             <div class="col-md-4">
-                <div class="card" style="border: 1px solid #e0e0e0; border-radius: 10px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);background-color: #ff3333">
+                <div class="card" style="height: 220px; border: 1px solid #e0e0e0; border-radius: 10px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); background-color: orangered">
                     <div class="card-body">
-                        <h3 class="card-title" style="font-size: 1.5rem; font-weight: bold; ">Books Borrowed but Not Returned</h3>
-                        <p class="card-text"  style="font-size: 90px;"><?php echo $notReturnedBooks; ?></p>
+                        <div style="float: left; width: 50%; padding-left: 30px">
+                            <p class="card-text" style="font-size: 70px;"><?php echo $notReturnedBooks; ?></p>
+                            <p class="card-text" style="font-size: 30px;">Not returned</p>
+                        </div>
+                        <div style=" display:flex; height: 100%; width: 50%; align-items: center; justify-content: flex-end">
+                            <i class="fa-solid fa-xmark" style="max-width: 50%; height: auto; opacity: 0.6"></i> <!-- Replace 'book_icon.png' with the path to your book icon image -->
+                        </div>
+                        <div style="clear: both;"></div> <!-- This div is used to clear the float, preventing it from affecting elements outside of the card -->
                     </div>
                 </div>
             </div>
 
             <div class="col-md-4">
-                <div class="card" style="border: 1px solid #e0e0e0; border-radius: 10px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);background-color: lightgreen">
+                <div class="card" style="height: 220px; border: 1px solid #e0e0e0; border-radius: 10px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); background-color: limegreen">
                     <div class="card-body">
-                        <h3 class="card-title" style="font-size: 1.5rem; font-weight: bold; ">Number of Readers</h3>
-                        <p class="card-text"  style="font-size: 90px;"><?php echo $totalReaders; ?></p>
+                        <div style="float: left; width: 50%; padding-left: 30px">
+                            <p class="card-text" style="font-size: 70px;"><?php echo $totalReaders; ?></p>
+                            <p class="card-text" style="font-size: 30px;">Readers</p>
+                        </div>
+                        <div style=" display:flex; height: 100%; width: 50%; align-items: center; justify-content: flex-end">
+                            <i class="fa-solid fa-users" style="max-width: 50%; height: auto; opacity: 0.6"></i> <!-- Replace 'book_icon.png' with the path to your book icon image -->
+                        </div>
+                        <div style="clear: both;"></div> <!-- This div is used to clear the float, preventing it from affecting elements outside of the card -->
                     </div>
                 </div>
             </div>
