@@ -4,41 +4,33 @@ header("Access-Control-Allow-Origin: *");
 
 //Get method for getting bookborrows
 if ($_SERVER['REQUEST_METHOD'] === 'GET'){
-//    //Connect to db
-//    include 'connection.php';
-//    //Check db connection
-//    if ($db->connect_error){
-//        die("Connection failed: " . $db->connect_error);
-//    }
-//    //Build query
-//    $query =  "SELECT * FROM BookReturn";
-//    //Check if there's a request for specific category(id)
-//    if (isset($_GET['id'])){
-//        $id = $_GET['id'];
-//        $query .= " WHERE id = '$id'";
-//    }
-//    //Re-Order Query result
-//    $query .= " ORDER BY return_date DESC";
-//    //Exec query
-//    $result = $db->query($query) or die("Error at: " . $db->error);
-//    //Store data into array
-//    $return = array();
-//    while ($row = $result->fetch_assoc()){
-//        $return[] = $row;
-//    }
-//    //Close connection
-//    $db->close();
-//    //Return response
-//
-////    echo json_encode($return, JSON_UNESCAPED_UNICODE);
-    $arr = array(
-        'US' => 'Washington',
-        'UK' => 'London',
-        'Spain' => 'Madrid',
-        'Italy' => 'Rome'
-    );
-
-    echo json_encode($arr);
+    //Connect to db
+    include 'connection.php';
+    //Check db connection
+    if ($db->connect_error){
+        die("Connection failed: " . $db->connect_error);
+    }
+    //Build query
+    $query =  "SELECT * FROM BookReturn";
+    //Check if there's a request for specific category(id)
+    if (isset($_GET['id'])){
+        $id = $_GET['id'];
+        $query .= " WHERE id = '$id'";
+    }
+    //Re-Order Query result
+    $query .= " ORDER BY return_date DESC";
+    //Exec query
+    $result = $db->query($query) or die("Error at: " . $db->error);
+    //Store data into array
+    $return = array();
+    while ($row = $result->fetch_assoc()){
+        $return[] = $row;
+    }
+    //Close connection
+    $db->close();
+    //Return response
+    echo json_encode($return, JSON_UNESCAPED_UNICODE);
+    die;
 }
 
 if ($_SERVER["REQUEST_METHOD"] === 'POST'){
