@@ -30,7 +30,7 @@
                 Thêm tài khoản nhân viên mới
             </div>
             <div class="card-body">
-                <form method="POST" action="api/api_employees.php">
+                <form>
                     <div class="form-floating mb-3">
                         <input class="form-control" id="inputName" type="text" placeholder="" name="name" required />
                         <label for="inputName">Tên nhân viên</label>
@@ -48,7 +48,7 @@
                         <label for="inputPhone">Số điện thoại</label>
                     </div>
                     <div class="d-flex align-items-center justify-content-between mt-4 mb-0">
-                        <button id="buttonAdd" type="submit" name="add" value="1" class="btn btn-primary">Thêm</button>
+                        <button id="buttonAdd" class="btn btn-primary">Thêm</button>
                     </div>
                 </form>
             </div>
@@ -60,7 +60,7 @@
                 Sửa thông tin tài khoản nhân viên
             </div>
             <div class="card-body">
-                <form method="POST" action="api/api_employees.php">
+                <form>
                     <div class="form-floating mb-3">
                         <input class="form-control" id="inputNameUpdate" type="text" placeholder="" name="name" required />
                         <label for="inputNameUpdate">Tên nhân viên</label>
@@ -79,7 +79,7 @@
                     </div>
                     <div class="d-flex align-items-center justify-content-between mt-4 mb-0">
                         <input id="inputIdUpdate" type="hidden" name="id"/>
-                        <button id="buttonUpdate" type="submit" name="edit" value="1" class="btn btn-primary">Cập nhật</button>
+                        <button id="buttonUpdate" class="btn btn-primary">Cập nhật</button>
                     </div>
                 </form>
             </div>
@@ -112,17 +112,14 @@
                             <td style="font-size: 20px; vertical-align: middle"><?= $row->password ?></td>
                             <td style="font-size: 20px; vertical-align: middle"><?= $row->phone ?></td>
                             <td>
-                                <form method="POST" action="api/api_employees.php">
-                                    <button class="btn btn-primary btn-edit"
-                                            data-id="<?= $row->id; ?>"
-                                            data-name="<?= $row->name; ?>"
-                                            data-email="<?= $row->email; ?>"
-                                            data-password="<?= $row->password; ?>"
-                                            data-phone="<?= $row->phone; ?>"
-                                            type="button">Sửa</button>
-                                    <input type="hidden" name="id" value="<?= $row->id; ?>"/>
-                                    <button class="btn btn-danger" type="submit" name="delete" value="1">Xoá</button>
-                                </form>
+                                <button class="btn btn-primary btn-edit"
+                                        data-id="<?= $row->id; ?>"
+                                        data-name="<?= $row->name; ?>"
+                                        data-email="<?= $row->email; ?>"
+                                        data-password="<?= $row->password; ?>"
+                                        data-phone="<?= $row->phone; ?>"
+                                        type="button">Sửa</button>
+                                <button class="btn btn-danger btn-delete" data-id="<?= $row->id; ?>">Xoá</button>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -141,6 +138,95 @@
             $("#inputPhone").val($(this).data('phone'));
 
             $("#form-edit").css('display','block');
+        });
+        $("#buttonAdd").click(function(){
+            var name = $("#inputName").val();
+            var email = $("#inputEmail").val();
+            var phone = $("#inputPhone").val();
+            var password = $("#inputPassword").val();
+            var confirmation = window.confirm("Bạn chắc chắn thêm nhân viên này?");
+            if (confirmation)
+            {
+                $.ajax({
+                    url: "https://vutt94.io.vn/library/api/api_employees.php",
+                    type: "POST",
+                    data: {
+                        name: name,
+                        phone: phone,
+                        email: email,
+                        password: password,
+                        add : true
+                    },
+                    success: function(data){
+                        if (data.status == "success"){
+                            alert("Thêm chủ đề thành công!");
+                            location.reload();
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.log('Error: ' + error.message);
+                        alert("Thêm chủ đề thất bại!");
+                    },
+                })
+            }
+        });
+        $("#buttonUpdate").click(function(){
+            var id = $("#inputIdUpdate").val();
+            var name = $("#inputNameUpdate").val();
+            var email = $("#inputEmailUpdate").val();
+            var phone = $("#inputPhoneUpdate").val();
+            var password = $("#inputPasswordUpdate").val();
+            var confirmation = window.confirm("Bạn chắc chắn sửa thông tin nhân viên này?");
+            if (confirmation)
+            {
+                $.ajax({
+                    url: "https://vutt94.io.vn/library/api/api_employees.php",
+                    type: "POST",
+                    data: {
+                        id : id,
+                        name: name,
+                        phone: phone,
+                        email: email,
+                        password: password,
+                        edit: true
+                    },
+                    success: function(data){
+                        if (data.status == "success"){
+                            alert("Sửa thông tin nhân viên thành công!");
+                            location.reload();
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.log('Error: ' + error.message);
+                        alert("Sửa thông tin nhân viên thất bại!");
+                    },
+                })
+            }
+        });
+        $(".btn-delete").click(function(){
+            var id = $(this).data("id");
+            var confirmation = window.confirm("Bạn chắc chắn xóa nhân viên này?");
+            if (confirmation)
+            {
+                $.ajax({
+                    url: "https://vutt94.io.vn/library/api/api_employees.php",
+                    type: "POST",
+                    data: {
+                        id : id,
+                        delete: true
+                    },
+                    success: function(data){
+                        if (data.status == "success"){
+                            alert("Xóa nhân viên thành công!");
+                            location.reload();
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.log('Error: ' + error.message);
+                        alert("Xóa nhân viên thất bại!");
+                    },
+                })
+            }
         });
     });
     function search_employees() {

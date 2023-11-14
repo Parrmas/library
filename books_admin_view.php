@@ -41,7 +41,7 @@
                 Thêm sách mới
             </div>
             <div class="card-body">
-                <form method="POST" action="api/api_books.php" enctype="multipart/form-data">
+                <form id="formAdd" method="" action="" enctype="multipart/form-data">
                     <div class="form-floating mb-3">
                         <input class="form-control" id="inputName" type="text" placeholder="" name="name" required />
                         <label for="inputName">Tên sách</label>
@@ -83,7 +83,7 @@
                 Sửa thông tin sách
             </div>
             <div class="card-body">
-                <form method="POST" action="api/api_books.php" enctype="multipart/form-data">
+                <form id="formUpdate" method="" action="" enctype="multipart/form-data">
                     <div class="form-floating mb-3">
                         <input class="form-control" id="inputNameUpdate" type="text" placeholder="" name="name" required />
                         <label for="inputNameUpdate">Tên sách</label>
@@ -150,18 +150,15 @@
                             <td style="font-size: 20px; vertical-align: middle"><?= $row->isbn ?></td>
                             <td style="font-size: 20px; vertical-align: middle; text-align: center"><?= $row->avail_copy ?></td>
                             <td style="vertical-align: middle; horiz-align: right">
-                                <form id="formAdd" method="POST" action="api/api_books.php">
-                                    <button class="btn btn-primary btn-edit"
-                                            data-id="<?= $row->id; ?>"
-                                            data-name="<?= $row->name; ?>"
-                                            data-author="<?= $row->author; ?>"
-                                            data-category="<?= $row->category_id; ?>"
-                                            data-isbn="<?= $row->isbn; ?>"
-                                            data-availcopy="<?= $row->avail_copy ?>"
-                                            type="button">Sửa</button>
-                                    <input type="hidden" name="id" value="<?= $row->id; ?>"/>
-                                    <button class="btn btn-danger" type="submit" name="delete" value="1">Xoá</button>
-                                </form>
+                                <button class="btn btn-primary btn-edit"
+                                        data-id="<?= $row->id; ?>"
+                                        data-name="<?= $row->name; ?>"
+                                        data-author="<?= $row->author; ?>"
+                                        data-category="<?= $row->category_id; ?>"
+                                        data-isbn="<?= $row->isbn; ?>"
+                                        data-availcopy="<?= $row->avail_copy ?>"
+                                        type="button">Sửa</button>
+                                <button class="btn btn-danger btn-delete" data-id="<?=$row->id;?>">Xoá</button>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -190,7 +187,7 @@
         });
     };
     $(function(){
-        $("#buttonAdd").click(function(){
+        $("#inputISBN").change(function(){
             event.preventDefault();
             var isbn = $("#inputISBN").val();
             var regex = /^97(8|9)[-\d]{10}\d$/;
@@ -208,7 +205,7 @@
                 }
             }
         });
-        $("#buttonUpdate").click(function(){
+        $("#inputISBNUpdate").change(function(){
             event.preventDefault();
             var isbn = $("#inputISBNUpdate").val();
             var regex = /^97(8|9)[-\d]{10}\d$/;
@@ -228,6 +225,115 @@
                 }
             }
         });
+        $("#buttonAdd").click(function(event){
+            event.preventDefault();
+            var name = $('#inputName').val();
+            var author = $('#inputAuthor').val();
+            var category_id = $('#inputCategory').val();
+            var isbn = $('#inputISBN').val();
+            var avail_copy = $('#inputAvailCopy').val();
+            var fileToUpload = $('#fileToUpload')[0].files[0];
+            var formData = new FormData();
+            formData.append('name', name);
+            formData.append('author', author);
+            formData.append('category_id', category_id);
+            formData.append('isbn', isbn);
+            formData.append('avail_copy', avail_copy);
+            formData.append('fileToUpload', fileToUpload);
+            formData.append('add',true);
+            var confirmation = window.confirm("Bạn chắc chắn thêm sách mới?");
+            if (confirmation)
+            {
+                $.ajax({
+                url: 'https://vutt94.io.vn/library/api/api_books.php',
+                type: 'POST',
+                data: formData, dataType: 'json',
+                processData: false,
+                contentType: false,
+                success: function(data) {
+                    console.log(data);
+                    // You can add more actions here based on the response from the server
+                    if (data.status == "success") {
+                        alert("Thêm sách mới thành công!");
+                        location.reload();
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.log('Error: ' + error.message);
+                    alert("Thêm sách thất bại!");
+                },
+            });
+            }
+        });
+        $("#buttonUpdate").click(function(event){
+            event.preventDefault();
+            var id = $('#inputIdUpdate').val();
+            var name = $('#inputNameUpdate').val();
+            var author = $('#inputAuthorUpdate').val();
+            var category_id = $('#inputCategoryUpdate').val();
+            var isbn = $('#inputISBNUpdate').val();
+            var avail_copy = $('#inputAvailCopyUpdate').val();
+            var fileToUpload = $('#fileToUploadUpdate')[0].files[0];
+            var formData = new FormData();
+            formData.append('id',id);
+            formData.append('name', name);
+            formData.append('author', author);
+            formData.append('category_id', category_id);
+            formData.append('isbn', isbn);
+            formData.append('avail_copy', avail_copy);
+            formData.append('fileToUpload', fileToUpload);
+            formData.append('edit',true);
+            var confirmation = window.confirm("Bạn chắc chắn sửa thông tin sách này?");
+            if (confirmation)
+            {
+                $.ajax({
+                    url: 'https://vutt94.io.vn/library/api/api_books.php',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,  // tell jQuery not to process the data
+                    contentType: false,  // tell jQuery not to set contentType
+                    timeout: 5000,
+                    success: function(data) {
+                        // You can add more actions here based on the response from the server
+                        if (data.status == "success") {
+                            alert("Sửa thông tin sách thành công!");
+                            location.reload();
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.log('Error: ' + error.message);
+                        alert("Sửa thông tin sách thất bại!");
+                    },
+                });
+            }
+        });
+        $(".btn-delete").click(function(event){
+            var id = $(this).data('id');
+            var confirmation = window.confirm("Bạn chắc chắn xóa sách này?");
+            if (confirmation)
+            {
+                $.ajax({
+                    url: 'https://vutt94.io.vn/library/api/api_books.php',
+                    type: 'POST',
+                    data: {
+                        id: id,
+                        delete: true
+                    },
+                    success: function(data) {
+                        console.log(data);
+                        // You can add more actions here based on the response from the server
+                        if (data.status == "success") {
+                            alert("Xóa sách thành công!");
+                            location.reload();
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.log('Error: ' + error.message);
+                        alert("Xóa sách thất bại!");
+                    },
+                });
+            }
+        })
     });
 </script>
 <?php include 'foot.php'?>

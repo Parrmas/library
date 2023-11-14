@@ -113,31 +113,34 @@ $readersJson = json_encode($readers);
             var reader_id = $("#inputReader").val();
             var book_id = $("#inputBook").val();
             var due_date = $("#inputDueDate").val();
-            $.ajax({
-                url: "https://vutt94.io.vn/library/api/api_bookborrow.php",
-                type: "POST",
-                data: {
-                    reader_id: reader_id,
-                    book_id: book_id,
-                    due_date: due_date,
-                    add: true
-                }, success: function (data) {
-                    if (data.status == 'success'){
-                        var confirmation = window.confirm('Lập phiếu mượn sách thành công!');
-                        if (confirmation){
-                            location.reload();
-                            window.location.href = "listBorrow_employee_view.php"
+            var confirmation = window.confirm("Bạn chắc chắn lập phiếu mượn mới?");
+            if (confirmation) {
+                $.ajax({
+                    url: "https://vutt94.io.vn/library/api/api_bookborrow.php",
+                    type: "POST",
+                    data: {
+                        reader_id: reader_id,
+                        book_id: book_id,
+                        due_date: due_date,
+                        add: true
+                    }, success: function (data) {
+                        if (data.status == 'success') {
+                            var confirmation = window.confirm('Lập phiếu mượn sách thành công!');
+                            if (confirmation) {
+                                location.reload();
+                                window.location.href = "listBorrow_employee_view.php"
+                            }
+                        } else if (data.status == 'overload') {
+                            var confirmation = window.confirm('Độc giả không thể mượn quá 3 cuốn sách!');
+                            if (confirmation) {
+                                location.reload();
+                            }
                         }
-                    } else if(data.status == 'overload'){
-                        var confirmation = window.confirm('Độc giả không thể mượn quá 3 cuốn sách!');
-                        if (confirmation){
-                            location.reload();
-                        }
+                    }, error: function (error) {
+                        alert("Lập phiếu mượn sách thất bại!");
                     }
-                }, error: function (error) {
-                    alert("Lập phiếu mượn sách thất bại!");
-                }
-            })
+                })
+            }
         });
     });
 </script><link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />

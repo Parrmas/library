@@ -143,25 +143,28 @@ $returns = json_decode($response);
         $("#buttonUpdate").click(function(){
             var id = $("#inputIdUpdate").val();
             var borrow_id = $("#inputBorrowUpdate").val();
-            $.ajax({
-                url: "https://vutt94.io.vn/library/api/api_bookreturn.php",
-                type: "POST",
-                timeout: 5000,
-                data: {
-                    id: id,
-                    borrow_id: borrow_id,
-                    edit: true
-                }, success: function (data) {
-                    if (data.status == 'success'){
-                        var confirmation = window.confirm('Cập nhật phiếu trả sách thành công!');
-                        if (confirmation){
-                            location.reload();
+            var confirmation = window.confirm("Bạn chắc chắn sửa thông tin phiếu mượn này?");
+            if (confirmation) {
+                $.ajax({
+                    url: "https://vutt94.io.vn/library/api/api_bookreturn.php",
+                    type: "POST",
+                    timeout: 5000,
+                    data: {
+                        id: id,
+                        borrow_id: borrow_id,
+                        edit: true
+                    }, success: function (data) {
+                        if (data.status == 'success') {
+                            var confirmation = window.confirm('Cập nhật phiếu trả sách thành công!');
+                            if (confirmation) {
+                                location.reload();
+                            }
                         }
+                    }, error: function (error) {
+                        alert("Cập nhật phiếu trả sách thất bại!");
                     }
-                }, error: function (error) {
-                    alert("Cập nhật phiếu trả sách thất bại!");
-                }
-            });
+                });
+            }
         });
     });
 </script><link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />

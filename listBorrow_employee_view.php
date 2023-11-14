@@ -97,6 +97,12 @@ $borrows = json_decode($response);
                     <div class="col-md-6">
                         <input id="search-input" type="text" class="form-control" oninput="search_borrow()" placeholder="Search..."/>
                     </div>
+                    <div class="col-md-6">
+                        <select id="selectUnreturned" class="form-select">
+                            <option value="all">Tất cả</option>
+                            <option value="unreturned">Chưa trả</option>
+                        </select>
+                    </div>
                 </div>
                 <table class="table">
                     <tr>
@@ -184,25 +190,41 @@ $borrows = json_decode($response);
             var reader_id = $("#inputReaderUpdate").val();
             var book_id = $("#inputBookUpdate").val();
             var due_date = $("#inputDueDateUpdate").val();
-            $.ajax({
-                url: "https://vutt94.io.vn/library/api/api_bookborrow.php",
-                type: "POST",
-                data: {
-                    id: id,
-                    reader_id: reader_id,
-                    book_id: book_id,
-                    due_date: due_date,
-                    edit: true
-                }, success: function (data) {
-                    if (data.status == 'success'){
-                        var confirmation = window.confirm('Cập nhật phiếu mượn sách thành công!');
-                        if (confirmation){
-                            location.reload();
+            var confirmation = window.confirm("Bạn chắc chắn sửa thông tin phiếu mượn này");
+            if (confirmation) {
+                $.ajax({
+                    url: "https://vutt94.io.vn/library/api/api_bookborrow.php",
+                    type: "POST",
+                    data: {
+                        id: id,
+                        reader_id: reader_id,
+                        book_id: book_id,
+                        due_date: due_date,
+                        edit: true
+                    }, success: function (data) {
+                        if (data.status == 'success') {
+                            var confirmation = window.confirm('Cập nhật phiếu mượn sách thành công!');
+                            if (confirmation) {
+                                location.reload();
+                            }
                         }
+                    }, error: function (error) {
+                        alert("Cập nhật phiếu mượn sách thất bại!");
                     }
-                }, error: function (error) {
-                    alert("Cập nhật phiếu mượn sách thất bại!");
-                }
+                });
+            }
+        });
+        $("#selectUnreturned").change(function(){
+            var select = $("#selectUnreturned").val();
+            var value = "";
+            if (select == "all"){
+                value = "";
+            } else if (select == "unreturned"){
+                value = "Chưa trả".toLowerCase();
+            }
+            console.log(value);
+            $('#borrow-list tr').filter(function () {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
             });
         });
     });

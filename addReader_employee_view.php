@@ -42,27 +42,30 @@
             var name = $("#inputName").val();
             var email = $("#inputEmail").val();
             var phone = $("#inputPhone").val();
-            $.ajax({
-                url: "https://vutt94.io.vn/library/api/api_addReader.php",
-                type: "POST",
-                data:{
-                    name: name,
-                    email: email,
-                    phone: phone
-                },
-                dataType: "json",
-                success: function (data) {
-                    if (data.status == 7){
-                        var confirmation = window.confirm(data.message);
-                        if (confirmation){
-                            window.location.href = "listReader_employee_view.php";
+            var confirmation = window.confirm("Bạn chắc chắn thêm độc giả này?");
+            if (confirmation) {
+                $.ajax({
+                    url: "https://vutt94.io.vn/library/api/api_addReader.php",
+                    type: "POST",
+                    data: {
+                        name: name,
+                        email: email,
+                        phone: phone
+                    },
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.status == 7) {
+                            var confirmation = window.confirm(data.message);
+                            if (confirmation) {
+                                window.location.href = "listReader_employee_view.php";
+                            }
                         }
+                    },
+                    error: function (data) {
+                        alert(data.message);
                     }
-                },
-                error: function (data) {
-                    alert(data.message);
-                }
-            })
+                })
+            }
         })
     })
 </script>

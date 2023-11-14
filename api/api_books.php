@@ -101,18 +101,23 @@
                 }
             }
 
+            if (!isset($response)) {
+                $response = ['status' => 'error', 'message' => 'Unknown error occurred.'];
+            }
+//            echo json_encode($response);
+
             $stmt = $db->prepare("INSERT INTO Books (name, author, category_id, isbn, avail_copy, img) VALUES (?, ?, ?, ?, ?, ?)");
             $stmt->bind_param("ssisss", $name, $author, $category_id, $isbn, $avail_copy, $img);
 
             $result = $stmt->execute();
 
-            $db->close();
-
             if ($result) {
-                header('Location:../books_admin_view.php');
+                echo json_encode(['status'=>'success']);
             } else {
-                die("Error: " . $stmt->error);
+                echo json_encode(['status'=>'error', 'message' => 'Database query failed.']);
             }
+            $db->close();
+            exit;
         }
         if (isset($_POST['edit'])) {
             // Edit existing record
@@ -151,7 +156,8 @@
                     //Delete the old image
                     $query = "SELECT img FROM Books WHERE id = '$id'";
                     $result = $db->query($query) or die("Error at: " . $db->error);
-                    $old_file_path = "api/images/". $result;
+                    $row = $result->fetch_assoc();
+                    $old_file_path = "images/". $row['img'];
                     if (file_exists($old_file_path)) {
                         unlink($old_file_path);
                     }
@@ -180,23 +186,31 @@
             $result = $stmt->execute();
 
             if ($result) {
-                echo json_encode(['message' => 'Record updated successfully']);
+                echo json_encode(['status'=>'success']);
             } else {
-                echo json_encode(['message' => 'Failed to update record']);
+                echo json_encode(['status'=>'error']);
             }
-
             $db->close();
-
-            header('Location:../books_admin_view.php');
+            exit;
         }
         if(isset($_POST['delete'])){
             // Edit existing record
             $id = $_POST['id'];
 
+            $query = "SELECT img FROM Books WHERE id = '$id'";
+            $result = $db->query($query) or die("Error at: " . $db->error);
+            $row = $result->fetch_assoc();
+            $old_file_path = "images/". $row['img'];
+            unlink($old_file_path);
             $query = "DELETE FROM Books WHERE id = '$id'";
             $result = $db->query($query) or die("Error at: " . $db->error);
+            if ($result) {
+                echo json_encode(['status'=>'success']);
+            } else {
+                echo json_encode(['status'=>'error']);
+            }
             $db->close();
-            header('Location: ../books_admin_view.php');
+            exit;
         }
     }
 ?>

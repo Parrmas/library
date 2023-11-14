@@ -103,29 +103,32 @@ $readers = json_decode($response);
                 var name = $("#inputNameUpdate").val();
                 var email = $("#inputEmailUpdate").val();
                 var phone = $("#inputPhoneUpdate").val();
-                $.ajax({
-                    url: "https://vutt94.io.vn/library/api/api_editReader.php",
-                    type: "POST",
-                    data:{
-                        id: id,
-                        name: name,
-                        email: email,
-                        phone: phone
-                    },
-                    dataType: "json",
-                    success: function (data) {
-                        console.log(data);
-                        if (data.status == 8){
-                            var confirmation = window.confirm(data.message);
-                            if (confirmation){
-                                location.reload();
+                var confirmation = window.confirm("Bạn chắc chắn sửa thông tin độc giả này?");
+                if (confirmation) {
+                    $.ajax({
+                        url: "https://vutt94.io.vn/library/api/api_editReader.php",
+                        type: "POST",
+                        data: {
+                            id: id,
+                            name: name,
+                            email: email,
+                            phone: phone
+                        },
+                        dataType: "json",
+                        success: function (data) {
+                            console.log(data);
+                            if (data.status == 8) {
+                                var confirmation = window.confirm(data.message);
+                                if (confirmation) {
+                                    location.reload();
+                                }
                             }
+                        },
+                        error: function (data) {
+                            alert(data.message);
                         }
-                    },
-                    error: function (data) {
-                        alert(data.message);
-                    }
-                })
+                    })
+                }
             });
         });
         function search_readers() {

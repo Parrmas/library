@@ -43,6 +43,11 @@
             $name = $_POST['name'];
             $query = "INSERT INTO BookCategories (name) VALUES ('$name')";
             $result = $db->query($query) or die("Error at: " . $db->error);
+            if ($result) {
+                echo json_encode(['status'=>'success']);
+            } else {
+                echo json_encode(['status'=>'error']);
+            }
             $db->close();
         }
         if (isset($_POST['edit'])){
@@ -50,15 +55,23 @@
             $name = $_POST['name'];
             $query = "UPDATE BookCategories SET name = '$name' WHERE id = '$id'";
             $result = $db->query($query) or die("Error at: " . $db->error);
+            if ($result) {
+                echo json_encode(['status'=>'success']);
+            } else {
+                echo json_encode(['status'=>'error']);
+            }
             $db->close();
         }
         if (isset($_POST['delete'])){
             $id = $_POST['id'];
             $query = "DELETE FROM BookCategories WHERE id = '$id'";
             $result = $db->query($query) or die("Error at: " . $db->error);
+            if ($result) {
+                echo json_encode(['status'=>'success']);
+            } else {
+                echo json_encode(['status'=>'error']);
+            }
             $db->close();
         }
-        header('Location:../categories_admin_view.php');
     }
 ?>
-

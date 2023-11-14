@@ -45,6 +45,11 @@
             $phone = $_POST['phone'];
             $query = "INSERT INTO Readers (name, email, phone) VALUES ('$name', '$email', '$phone')";
             $result = $db->query($query) or die("Error at: " . $db->error);
+            if ($result) {
+                echo json_encode(['status'=>'success']);
+            } else {
+                echo json_encode(['status'=>'error']);
+            }
             $db->close();
         }
         if (isset($_POST['edit'])) {
@@ -54,14 +59,23 @@
             $phone = $_POST['phone'];
             $query = "UPDATE Readers SET name = '$name', email = '$email', phone = '$phone' WHERE id = '$id'";
             $result = $db->query($query) or die("Error at: " . $db->error);
+            if ($result) {
+                echo json_encode(['status'=>'success']);
+            } else {
+                echo json_encode(['status'=>'error']);
+            }
             $db->close();
         }
         if (isset($_POST['delete'])) {
             $id = $_POST['id'];
             $query = "DELETE FROM Readers WHERE id = '$id'";
             $result = $db->query($query) or die("Error at: " . $db->error);
+            if ($result) {
+                echo json_encode(['status'=>'success']);
+            } else {
+                echo json_encode(['status'=>'error']);
+            }
             $db->close();
         }
-        header('Location:../employees_admin_view.php');
     }
 ?>

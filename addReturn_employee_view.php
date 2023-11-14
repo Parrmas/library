@@ -82,24 +82,27 @@ $borrows = json_decode($response);
     $(function() {
         $("#buttonAdd").click(function () {
             var borrow_id = $("#inputBorrow").val();
-            $.ajax({
-                url: "https://vutt94.io.vn/library/api/api_bookreturn.php",
-                type: "POST",
-                data: {
-                    borrow_id: borrow_id,
-                    add: true
-                }, success: function (data) {
-                    if (data.status == 'success'){
-                        var confirmation = window.confirm('Lập phiếu trả sách thành công!');
-                        if (confirmation){
-                            location.reload();
-                            window.location.href ="listReturn_employee_view.php";
+            var confirmation = window.confirm("Bạn chắc chắn lập phiếu trả mới?");
+            if (confirmation) {
+                $.ajax({
+                    url: "https://vutt94.io.vn/library/api/api_bookreturn.php",
+                    type: "POST",
+                    data: {
+                        borrow_id: borrow_id,
+                        add: true
+                    }, success: function (data) {
+                        if (data.status == 'success') {
+                            var confirmation = window.confirm('Lập phiếu trả sách thành công!');
+                            if (confirmation) {
+                                location.reload();
+                                window.location.href = "listReturn_employee_view.php";
+                            }
                         }
+                    }, error: function (error) {
+                        alert("Lập phiếu trả sách thất bại!");
                     }
-                }, error: function (error) {
-                    alert("Lập phiếu trả sách thất bại!");
-                }
-            })
+                })
+            }
         });
     });
 </script><link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />

@@ -206,68 +206,77 @@ $returns = json_decode($response);
     $(function() {
         $("#buttonAdd").click(function () {
             var borrow_id = $("#inputBorrow").val();
-            $.ajax({
-                url: "https://vutt94.io.vn/library/api/api_bookreturn.php",
-                type: "POST",
-                data: {
-                    borrow_id: borrow_id,
-                    add: true
-                }, success: function (data) {
-                    if (data.status == 'success'){
-                        var confirmation = window.confirm('Lập phiếu trả sách thành công!');
-                        if (confirmation){
-                            location.reload();
+            var confirmation = window.confirm("Bạn chắc chắn lập phiếu trả mới?");
+            if (confirmation) {
+                $.ajax({
+                    url: "https://vutt94.io.vn/library/api/api_bookreturn.php",
+                    type: "POST",
+                    data: {
+                        borrow_id: borrow_id,
+                        add: true
+                    }, success: function (data) {
+                        if (data.status == 'success') {
+                            var confirmation = window.confirm('Lập phiếu trả sách thành công!');
+                            if (confirmation) {
+                                location.reload();
+                            }
                         }
+                    }, error: function (error) {
+                        alert("Lập phiếu trả sách thất bại!");
                     }
-                }, error: function (error) {
-                    alert("Lập phiếu trả sách thất bại!");
-                }
-            })
+                })
+            }
         })
         $(".btn-delete").click(function () {
             var id = $(this).data('id');
             var borrow_id = $(this).data('borrow');
-            $.ajax({
-                url: "https://vutt94.io.vn/library/api/api_bookreturn.php",
-                type: "POST",
-                data: {
-                    id: id,
-                    borrow_id: borrow_id,
-                    delete: true
-                }, success: function (data) {
-                    if (data.status == 'success'){
-                        var confirmation = window.confirm('Xóa phiếu trả sách thành công!');
-                        if (confirmation){
-                            location.reload();
+            var confirmation = window.confirm("Bạn chắc chắn xóa phiếu trả này?");
+            if (confirmation) {
+                $.ajax({
+                    url: "https://vutt94.io.vn/library/api/api_bookreturn.php",
+                    type: "POST",
+                    data: {
+                        id: id,
+                        borrow_id: borrow_id,
+                        delete: true
+                    }, success: function (data) {
+                        if (data.status == 'success') {
+                            var confirmation = window.confirm('Xóa phiếu trả sách thành công!');
+                            if (confirmation) {
+                                location.reload();
+                            }
                         }
+                    }, error: function (error) {
+                        alert("Xóa phiếu trả sách thất bại!");
                     }
-                }, error: function (error) {
-                    alert("Xóa phiếu trả sách thất bại!");
-                }
-            })
+                })
+            }
         });
         $("#buttonUpdate").click(function(){
             var id = $("#inputIdUpdate").val();
             var borrow_id = $("#inputBorrowUpdate").val();
-            $.ajax({
-                url: "https://vutt94.io.vn/library/api/api_bookreturn.php",
-                type: "POST",
-                timeout: 5000,
-                data: {
-                    id: id,
-                    borrow_id: borrow_id,
-                    edit: true
-                }, success: function (data) {
-                    if (data.status == 'success'){
-                        var confirmation = window.confirm('Cập nhật phiếu trả sách thành công!');
-                        if (confirmation){
-                            location.reload();
+            var confirmation = window.confirm("Bạn chắc chắn sửa thông tin phiếu mượn này?");
+            if (confirmation) {
+                $.ajax({
+                    url: "https://vutt94.io.vn/library/api/api_bookreturn.php",
+                    type: "POST",
+                    timeout: 5000,
+                    data: {
+                        id: id,
+                        borrow_id: borrow_id,
+                        edit: true
+                    }, success: function (data) {
+                        if (data.status == 'success') {
+                            var confirmation = window.confirm('Cập nhật phiếu trả sách thành công!');
+                            if (confirmation) {
+                                location.reload();
+                            }
                         }
+                    }, error: function (error) {
+                        alert("Cập nhật phiếu trả sách thất bại!");
                     }
-                }, error: function (error) {
-                    alert("Cập nhật phiếu trả sách thất bại!");
-                }
-            });
+                });
+            }
         });
     });
 </script><link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />

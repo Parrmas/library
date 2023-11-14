@@ -38,13 +38,13 @@ while ($row = mysqli_fetch_assoc($result)){
                 Thêm chủ đề mới
             </div>
             <div class="card-body">
-                <form method="POST" action="api/api_categories.php">
+                <form>
                     <div class="form-floating mb-3">
                         <input class="form-control" id="inputName" type="text" placeholder="" name="name" required />
                         <label for="inputName">Tên chủ đề</label>
                     </div>
                     <div class="d-flex align-items-center justify-content-between mt-4 mb-0">
-                        <button id="buttonAdd" type="submit" name="add" value="1" class="btn btn-primary">Thêm</button>
+                        <button id="buttonAdd" class="btn btn-primary">Thêm</button>
                     </div>
                 </form>
             </div>
@@ -56,7 +56,7 @@ while ($row = mysqli_fetch_assoc($result)){
                 Sửa thông tin chủ đề
             </div>
             <div class="card-body">
-                <form method="POST" action="api/api_categories.php">
+                <form>
                     <div class="form-floating mb-3">
                         <input class="form-control" id="inputNameUpdate" type="text" placeholder="" name="name" required />
                         <label for="inputNameUpdate">Tên sách</label>
@@ -90,16 +90,13 @@ while ($row = mysqli_fetch_assoc($result)){
                     <?php foreach ($categories as $row): ?>
                         <tr>
                             <td style="font-size: 20px; vertical-align: middle; text-align: center"><?= $row->name ?></td>
-                            <td style="font-size: 20px; vertical-align: middle; text-align: center;"><?= $books_in_ea_cate[$row->id] ?></td>
+                            <td style="font-size: 20px; vertical-align: middle; text-align: center;"><?= isset($books_in_ea_cate[$row->id]) ? $books_in_ea_cate[$row->id] : 0 ?></td>
                             <td style="display: flex; justify-content: flex-end;">
-                                <form method="POST" action="api/api_categories.php" style="display: inline-flex; justify-content: flex-end">
-                                    <button class="btn btn-primary btn-edit"
-                                            data-id="<?= $row->id; ?>"
-                                            data-name="<?= $row->name; ?>"
-                                            type="button">Sửa</button>
-                                    <input type="hidden" name="id" value="<?= $row->id; ?>"/>
-                                    <button class="btn btn-danger" type="submit" name="delete" value="1">Xoá</button>
-                                </form>
+                                <button class="btn btn-primary btn-edit"
+                                        data-id="<?= $row->id; ?>"
+                                        data-name="<?= $row->name; ?>"
+                                        type="button">Sửa</button>
+                                <button class="btn btn-danger btn-delete" data-id="<?= $row->id; ?>">Xoá</button>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -115,6 +112,83 @@ while ($row = mysqli_fetch_assoc($result)){
             $("#inputNameUpdate").val($(this).data('name'));
 
             $("#form-edit").css('display','block');
+        });
+        $("#buttonAdd").click(function(){
+           var name = $("#inputName").val();
+            var confirmation = window.confirm("Bạn chắc chắn thêm chủ đề này?");
+            if (confirmation)
+            {
+                $.ajax({
+                    url: "https://vutt94.io.vn/library/api/api_categories.php",
+                    type: "POST",
+                    data: {
+                        name: name,
+                        add : true
+                    },
+                    success: function(data){
+                        if (data.status == "success"){
+                            alert("Thêm chủ đề thành công!");
+                            location.reload();
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.log('Error: ' + error.message);
+                        alert("Thêm chủ đề thất bại!");
+                    },
+                })
+            }
+        });
+        $("#buttonUpdate").click(function(){
+            var id = $("#inputIdUpdate").val();
+            var name = $("#inputNameUpdate").val();
+            var confirmation = window.confirm("Bạn chắc chắn sửa thông tin chủ đề này?");
+            if (confirmation)
+            {
+                $.ajax({
+                    url: "https://vutt94.io.vn/library/api/api_categories.php",
+                    type: "POST",
+                    data: {
+                        id : id,
+                        name: name,
+                        edit: true
+                    },
+                    success: function(data){
+                        if (data.status == "success"){
+                            alert("Sửa thông tin chủ đề thành công!");
+                            location.reload();
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.log('Error: ' + error.message);
+                        alert("Sửa thông tin chủ đề thất bại!");
+                    },
+                })
+            }
+        });
+        $(".btn-delete").click(function(){
+            var id = $(this).data("id");
+            var confirmation = window.confirm("Bạn chắc chắn xóa chủ đề này?");
+            if (confirmation)
+            {
+                $.ajax({
+                    url: "https://vutt94.io.vn/library/api/api_categories.php",
+                    type: "POST",
+                    data: {
+                        id : id,
+                        delete: true
+                    },
+                    success: function(data){
+                        if (data.status == "success"){
+                            alert("Xóa chủ đề thành công!");
+                            location.reload();
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.log('Error: ' + error.message);
+                        alert("Xóa chủ đề thất bại!");
+                    },
+                })
+            }
         });
     });
     function search_categories() {
