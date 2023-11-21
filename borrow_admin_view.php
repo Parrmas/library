@@ -9,7 +9,7 @@ if (!isset($_SESSION['admin'])) {
 
 <?php
 //Get all books
-$url = 'http://vutt94.io.vn/library/api/api_books.php';
+$url = 'http://vutt94.io.vn/library/api/api_booksAvailable.php';
 
 $client = curl_init($url);
 curl_setopt($client, CURLOPT_RETURNTRANSFER,true);
@@ -142,21 +142,28 @@ $borrows = json_decode($response);
                 </form>
             </div>
         </div>
-        <!--List section--!>
+        <!--List section-->
         <div class="card mb-4">
             <div class="card-header">
                 <i class="fas fa-table me-1"></i>
                 Danh sách phiếu mượn sách
             </div>
             <div class="card-body">
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <input id="search-input" type="text" class="form-control" oninput="search_borrow()" placeholder="Search..."/>
+                <div class="row d-flex">
+                    <div class="col-md-3 flex-fill">
+                        <input id="search-by-name" type="text" class="form-control" oninput="apply_filters()" placeholder="Tìm theo tên"/>
                     </div>
-                    <div class="col-md-6">
-                        <select id="selectUnreturned" class="form-select">
-                            <option value="all">Tất cả</option>
-                            <option value="unreturned">Chưa trả</option>
+                    <div class="col-md-3 flex-fill">
+                        <input id="search-by-email" type="text" class="form-control" oninput="apply_filters()" placeholder="Tìm theo email"/>
+                    </div>
+                    <div class="col-md-3 flex-fill">
+                        <input id="search-by-date-borrow" type="text" class="form-control" oninput="apply_filters()" placeholder="Tìm theo ngày mượn"/>
+                    </div>
+                    <div class="col-md-3 flex-fill">
+                        <select id="search-by-status" class="form-select" oninput="apply_filters()" placeholder="Trạng thái">
+                            <option value="">Tất cả</option>
+                            <option value="Chưa trả">Chưa trả</option>
+                            <option value="Đã trả">Đã trả</option>
                         </select>
                     </div>
                 </div>
@@ -207,44 +214,42 @@ $borrows = json_decode($response);
             $("#form-edit").css('display','block');
         });
     });
-    function search_borrow() {
-        var value = $('#search-input').val().toLowerCase();
-        $('#borrow-list tr').filter(function () {
-            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
-        });
-    };
+    function apply_filters() {
+        var filter_status = document.getElementById("search-by-status").value.toUpperCase();
+        var filter_name = document.getElementById("search-by-name").value.toUpperCase();
+        var filter_email = document.getElementById("search-by-email").value.toUpperCase();
+        var filter_date_borrow = document.getElementById("search-by-date-borrow").value.toUpperCase();
+
+        var borrowList = document.getElementById("borrow-list").getElementsByTagName("tr");
+
+        for (var i = 0; i < borrowList.length; i++) {
+            var td_status = borrowList[i].getElementsByTagName("td")[6];
+            var td_name = borrowList[i].getElementsByTagName("td")[1];
+            var td_email = borrowList[i].getElementsByTagName("td")[2];
+            var td_date_borrow = borrowList[i].getElementsByTagName("td")[4];
+
+            if (td_status && td_name && td_email && td_date_borrow) {
+                var txtValue_type = td_status.textContent;
+                var txtValue_name = td_name.textContent;
+                var txtValue_email = td_email.textContent;
+                var txtValue_date_borrow = td_date_borrow.textContent;
+
+                if (txtValue_type.toUpperCase().indexOf(filter_status) > -1 &&
+                    txtValue_name.toUpperCase().indexOf(filter_name) > -1 &&
+                    txtValue_email.toUpperCase().indexOf(filter_email) > -1 &&
+                    txtValue_date_borrow.toUpperCase().indexOf(filter_date_borrow) > -1)
+                {
+                    borrowList[i].style.display = "";
+                } else {
+                    borrowList[i].style.display = "none";
+                }
+            }
+        }
+    }
     function convertDateFormat(dateStr) {
         var dateParts = dateStr.split("/");
         return dateParts[1] + "/" + dateParts[0] + "/" + dateParts[2];
     }
-    $(function(){
-        $("#inputDueDate").change(function(event){
-            var due_date_string = $("#inputDueDate").val();
-            var converted_date_string = convertDateFormat(due_date_string);
-            var due_date = new Date(converted_date_string);
-            var curr_date = new Date();
-            if (curr_date > due_date) {
-                $("#inputDueDate")[0].setCustomValidity('Ngày trả sách không thể sớm hơn ngày hiện tại!');
-                $("#inputDueDate")[0].reportValidity();
-            } else {
-                $("#inputDueDate")[0].setCustomValidity('');
-            }
-        });
-    });
-    $(function(){
-        $("#inputDueDateUpdate").change(function(event){
-            var due_date_string = $("#inputDueDateUpdate").val();
-            var converted_date_string = convertDateFormat(due_date_string);
-            var due_date = new Date(converted_date_string);
-            var curr_date = new Date();
-            if (curr_date > due_date) {
-                $("#inputDueDateUpdate")[0].setCustomValidity('Ngày trả sách không thể sớm hơn ngày hiện tại!');
-                $("#inputDueDateUpdate")[0].reportValidity();
-            } else {
-                $("#inputDueDateUpdate")[0].setCustomValidity('');
-            }
-        });
-    });
 </script>
 <script src="js/jquery-3.7.0.min.js"></script>
 <script src="js/datepicker.js"></script>
@@ -260,38 +265,48 @@ $borrows = json_decode($response);
             todayHighlight: true,
             format: "dd/mm/yyyy"
         });
-        $("#buttonAdd").click(function () {
+        $("#buttonAdd").click(function (event) {
+            event.preventDefault();
             var reader_id = $("#inputReader").val();
             var book_id = $("#inputBook").val();
-            var due_date = $("#inputDueDate").val();
-            var confirmation = window.confirm("Bạn chắc chắn lập phiếu mượn mới?");
-            if (confirmation) {
-                $.ajax({
-                    url: "https://vutt94.io.vn/library/api/api_bookborrow.php",
-                    type: "POST",
-                    data: {
-                        reader_id: reader_id,
-                        book_id: book_id,
-                        due_date: due_date,
-                        add: true
-                    }, success: function (data) {
-                        if (data.status == 'success') {
-                            var confirmation = window.confirm('Lập phiếu mượn sách thành công!');
-                            if (confirmation) {
-                                location.reload();
+            var due_date_string = $("#inputDueDate").val();
+            var converted_date_string = convertDateFormat(due_date_string);
+            var due_date = new Date(converted_date_string);
+            var curr_date = new Date();
+            if (curr_date > due_date) {
+                $("#inputDueDate")[0].setCustomValidity('Ngày trả sách không thể sớm hơn ngày hiện tại!');
+                $("#inputDueDate")[0].reportValidity();
+                return;
+            } else {
+                var confirmation = window.confirm("Bạn chắc chắn lập phiếu mượn mới?");
+                if (confirmation) {
+                    $.ajax({
+                        url: "https://vutt94.io.vn/library/api/api_bookborrow.php",
+                        type: "POST",
+                        data: {
+                            reader_id: reader_id,
+                            book_id: book_id,
+                            due_date: due_date_string,
+                            add: true
+                        }, success: function (data) {
+                            if (data.status == 'success') {
+                                var confirmation = window.confirm('Lập phiếu mượn sách thành công!');
+                                if (confirmation) {
+                                    location.reload();
+                                }
+                            } else if (data.status == 'overload') {
+                                var confirmation = window.confirm('Độc giả không thể mượn quá 3 cuốn sách!');
+                                if (confirmation) {
+                                    location.reload();
+                                }
                             }
-                        } else if (data.status == 'overload') {
-                            var confirmation = window.confirm('Độc giả không thể mượn quá 3 cuốn sách!');
-                            if (confirmation) {
-                                location.reload();
-                            }
+                        }, error: function (error) {
+                            alert("Lập phiếu mượn sách thất bại!");
                         }
-                    }, error: function (error) {
-                        alert("Lập phiếu mượn sách thất bại!");
-                    }
-                })
+                    })
+                }
             }
-        })
+        });
         $(".btn-delete").click(function () {
             var id = $(this).data('id');
             var book_id = $(this).data('book');
@@ -321,43 +336,39 @@ $borrows = json_decode($response);
             var id = $("#inputIdUpdate").val();
             var reader_id = $("#inputReaderUpdate").val();
             var book_id = $("#inputBookUpdate").val();
-            var due_date = $("#inputDueDateUpdate").val();
-            var confirmation = window.confirm("Bạn chắc chắn sửa thông tin phiếu mượn này");
-            if (confirmation) {
-                $.ajax({
-                    url: "https://vutt94.io.vn/library/api/api_bookborrow.php",
-                    type: "POST",
-                    data: {
-                        id: id,
-                        reader_id: reader_id,
-                        book_id: book_id,
-                        due_date: due_date,
-                        edit: true
-                    }, success: function (data) {
-                        if (data.status == 'success') {
-                            var confirmation = window.confirm('Cập nhật phiếu mượn sách thành công!');
-                            if (confirmation) {
-                                location.reload();
+            var due_date_string = $("#inputDueDateUpdate").val();
+            var converted_date_string = convertDateFormat(due_date_string);
+            var due_date = new Date(converted_date_string);
+            var curr_date = new Date();
+            if (curr_date > due_date) {
+                $("#inputDueDateUpdate")[0].setCustomValidity('Ngày trả sách không thể sớm hơn ngày hiện tại!');
+                $("#inputDueDateUpdate")[0].reportValidity();
+                return;
+            } else {
+                var confirmation = window.confirm("Bạn chắc chắn sửa thông tin phiếu mượn này");
+                if (confirmation) {
+                    $.ajax({
+                        url: "https://vutt94.io.vn/library/api/api_bookborrow.php",
+                        type: "POST",
+                        data: {
+                            id: id,
+                            reader_id: reader_id,
+                            book_id: book_id,
+                            due_date: due_date_string,
+                            edit: true
+                        }, success: function (data) {
+                            if (data.status == 'success') {
+                                var confirmation = window.confirm('Cập nhật phiếu mượn sách thành công!');
+                                if (confirmation) {
+                                    location.reload();
+                                }
                             }
+                        }, error: function (error) {
+                            alert("Cập nhật phiếu mượn sách thất bại!");
                         }
-                    }, error: function (error) {
-                        alert("Cập nhật phiếu mượn sách thất bại!");
-                    }
-                });
+                    });
+                }
             }
-        });
-        $("#selectUnreturned").change(function(){
-            var select = $("#selectUnreturned").val();
-            var value = "";
-            if (select == "all"){
-                value = "";
-            } else if (select == "unreturned"){
-                value = "Chưa trả".toLowerCase();
-            }
-            console.log(value);
-            $('#borrow-list tr').filter(function () {
-                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
-            });
         });
     });
 </script><link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />

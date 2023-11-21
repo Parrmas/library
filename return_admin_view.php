@@ -103,9 +103,12 @@ $returns = json_decode($response);
                 Danh sách phiếu trả sách
             </div>
             <div class="card-body">
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <input id="search-input" type="text" class="form-control" oninput="search_return()" placeholder="Search..."/>
+                <div class="row d-flex">
+                    <div class="col-md-3 flex-fill">
+                        <input id="search-by-borrow" type="text" class="form-control" oninput="apply_filters()" placeholder="Tìm theo mã phiếu mượn"/>
+                    </div>
+                    <div class="col-md-3 flex-fill">
+                        <input id="search-by-date-return" type="text" class="form-control" oninput="apply_filters()" placeholder="Tìm theo ngày trả"/>
                     </div>
                 </div>
                 <table class="table">
@@ -145,12 +148,30 @@ $returns = json_decode($response);
             $("#form-edit").css('display','block');
         });
     });
-    function search_return() {
-        var value = $('#search-input').val().toLowerCase();
-        $('#return-list tr').filter(function () {
-            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
-        });
-    };
+    function apply_filters() {
+        var filter_borrow = document.getElementById("search-by-borrow").value.toUpperCase();
+        var filter_date_return = document.getElementById("search-by-date-return").value.toUpperCase();
+
+        var returnList = document.getElementById("return-list").getElementsByTagName("tr");
+
+        for (var i = 0; i < returnList.length; i++) {
+            var td_borrow = returnList[i].getElementsByTagName("td")[0];
+            var td_date_return = returnList[i].getElementsByTagName("td")[1];
+
+            if (td_borrow && td_date_return) {
+                var txtValue_borrow = td_borrow.textContent;
+                var txtValue_date_return = td_date_return.textContent;
+
+                if (txtValue_borrow.toUpperCase().indexOf(filter_borrow) > -1 &&
+                    txtValue_date_return.toUpperCase().indexOf(filter_date_return) > -1)
+                {
+                    returnList[i].style.display = "";
+                } else {
+                    returnList[i].style.display = "none";
+                }
+            }
+        }
+    }
     $(function(){
         $("#inputBorrow").change(function(event){
             var id = $("#inputBorrow").val();

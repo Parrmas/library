@@ -59,7 +59,7 @@ if ($_SERVER["REQUEST_METHOD"] === 'POST'){
         $formatted_due_date = date_format($due_date, "Y-m-d");
         $returned = 0; //0 as false; 1 as true
         $query = "INSERT INTO BookBorrow (reader_id, book_id, borrow_date, due_date, returned) VALUES ('$reader_id', '$book_id', '$borrow_date', '$formatted_due_date', '$returned')";
-        $result1 = $db->query($query) or die("Error at: " . $db->error);
+        $result1 = $db->query($query) or die("Error at: " . $db->error);    
         //Get book to update avail copy
         $query =  "SELECT * FROM Books WHERE id = '$book_id'";
         $result = $db->query($query) or die("Error at: " . $db->error);

@@ -85,20 +85,6 @@ $readersJson = json_encode($readers);
         var dateParts = dateStr.split("/");
         return dateParts[1] + "/" + dateParts[0] + "/" + dateParts[2];
     }
-    $(function(){
-        $("#inputDueDate").change(function(event){
-            var due_date_string = $("#inputDueDate").val();
-            var converted_date_string = convertDateFormat(due_date_string);
-            var due_date = new Date(converted_date_string);
-            var curr_date = new Date();
-            if (curr_date > due_date) {
-                $("#inputDueDate")[0].setCustomValidity('Ngày trả sách không thể sớm hơn ngày hiện tại!');
-                $("#inputDueDate")[0].reportValidity();
-            } else {
-                $("#inputDueDate")[0].setCustomValidity('');
-            }
-        });
-    });
 </script>
 <script src="js/jquery-3.7.0.min.js"></script>
 <script src="js/datepicker.js"></script>
@@ -109,39 +95,48 @@ $readersJson = json_encode($readers);
             todayHighlight: true,
             format: "dd/mm/yyyy"
         });
-        $("#buttonAdd").click(function () {
+        $("#buttonAdd").click(function (event) {
+            event.preventDefault();
             var reader_id = $("#inputReader").val();
             var book_id = $("#inputBook").val();
-            var due_date = $("#inputDueDate").val();
-            var confirmation = window.confirm("Bạn chắc chắn lập phiếu mượn mới?");
-            if (confirmation) {
-                $.ajax({
-                    url: "https://vutt94.io.vn/library/api/api_bookborrow.php",
-                    type: "POST",
-                    data: {
-                        reader_id: reader_id,
-                        book_id: book_id,
-                        due_date: due_date,
-                        add: true
-                    }, success: function (data) {
-                        if (data.status == 'success') {
-                            var confirmation = window.confirm('Lập phiếu mượn sách thành công!');
-                            if (confirmation) {
-                                location.reload();
-                                window.location.href = "listBorrow_employee_view.php"
+            var due_date_string = $("#inputDueDate").val();
+            var converted_date_string = convertDateFormat(due_date_string);
+            var due_date = new Date(converted_date_string);
+            var curr_date = new Date();
+            if (curr_date > due_date) {
+                $("#inputDueDate")[0].setCustomValidity('Ngày trả sách không thể sớm hơn ngày hiện tại!');
+                $("#inputDueDate")[0].reportValidity();
+                return;
+            } else {
+                var confirmation = window.confirm("Bạn chắc chắn lập phiếu mượn mới?");
+                if (confirmation) {
+                    $.ajax({
+                        url: "https://vutt94.io.vn/library/api/api_bookborrow.php",
+                        type: "POST",
+                        data: {
+                            reader_id: reader_id,
+                            book_id: book_id,
+                            due_date: due_date_string,
+                            add: true
+                        }, success: function (data) {
+                            if (data.status == 'success') {
+                                var confirmation = window.confirm('Lập phiếu mượn sách thành công!');
+                                if (confirmation) {
+                                    location.reload();
+                                }
+                            } else if (data.status == 'overload') {
+                                var confirmation = window.confirm('Độc giả không thể mượn quá 3 cuốn sách!');
+                                if (confirmation) {
+                                    location.reload();
+                                }
                             }
-                        } else if (data.status == 'overload') {
-                            var confirmation = window.confirm('Độc giả không thể mượn quá 3 cuốn sách!');
-                            if (confirmation) {
-                                location.reload();
-                            }
+                        }, error: function (error) {
+                            alert("Lập phiếu mượn sách thất bại!");
                         }
-                    }, error: function (error) {
-                        alert("Lập phiếu mượn sách thất bại!");
-                    }
-                })
+                    })
+                }
             }
-        });
+        })
     });
 </script><link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>

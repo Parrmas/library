@@ -37,7 +37,17 @@ if (!isset($_SESSION['admin'])) {
         $totalReaders += 1;
     }
 
-?>
+    include 'api/connection.php';
+    $query = "SELECT bb.borrow_date, COUNT(bb.id) as num_borrow, COALESCE(SUM(br.fine),0) as total_fine
+                        FROM BookBorrow bb 
+                        LEFT JOIN BookReturn br ON bb.id = br.borrow_id
+                        GROUP BY bb.borrow_date
+                        ORDER BY bb.borrow_date DESC";
+    $result = $result = $db->query($query) or die("Error at: " . $db->error);
+    $data = array();
+    while ($row = $result->fetch_assoc()){
+        $data[] = $row;
+    }
 ?>
 <?php include 'head.php'?>
 <main>
@@ -58,7 +68,7 @@ if (!isset($_SESSION['admin'])) {
         <ol class="breadcrumb mb-4">
             <li class="breadcrumb-item active" style="font-size: 30px">Thống kê</li>
         </ol>
-        <div class="row">
+        <div class="row mb-3">
             <div class="col-md-4">
                 <div class="card" style="height: 220px; border: 1px solid #e0e0e0; border-radius: 10px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); background-color: lightblue">
                     <div class="card-body">
@@ -104,6 +114,131 @@ if (!isset($_SESSION['admin'])) {
                 </div>
             </div>
         </div>
+        <!--List section--!>
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-table me-1"></i>
+                Thống kê
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <div class="form-floating">
+                            <select id = "selectQuery" class="form-select">
+                            <option value="date">Theo ngày</option>
+                            <option value="month">Theo tháng</option>
+                            </select>
+                            <label for = "selectQuery">Chọn loại thống kê</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating">
+                            <select id = "monthQuery" class="form-select">
+                                <option value="">Mặc định</option>
+                                <option value="1">Tháng 1</option>
+                                <option value="2">Tháng 2</option>
+                                <option value="3">Tháng 3</option>
+                                <option value="4">Tháng 4</option>
+                                <option value="5">Tháng 5</option>
+                                <option value="6">Tháng 6</option>
+                                <option value="7">Tháng 7</option>
+                                <option value="8">Tháng 8</option>
+                                <option value="9">Tháng 9</option>
+                                <option value="10">Tháng 10</option>
+                                <option value="11">Tháng 11</option>
+                                <option value="12">Tháng 12</option>
+                            </select>
+                            <label for = "monthQuery">Chọn tháng thống kê</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating">
+                            <select id = "amountOrder" class="form-select">
+                                <option value="">Mặc định</option>
+                                <option value="asc">Tăng dần</option>
+                                <option value="desc">Giảm dần</option>
+                            </select>
+                            <label for = "amountOrder">Sắp xếp số lượng sách</label>
+                        </div>
+                    </div>
+                </div>
+                <table class="table">
+                    <tr>
+                        <th>Ngày/Tháng</th>
+                        <th>Số đơn</th>
+                        <th>Tổng thu</th>
+                    </tr>
+                    <tbody id="analytic-list">
+                    <?php foreach($data as $row): ?>
+                        <tr>
+                            <td><?=date_format(new DateTime($row['borrow_date']),'d/m/Y');?></td>
+                            <td><?=$row['num_borrow'];?></td>
+                            <td><?=number_format($row['total_fine'], 0, ',', ',');?> VNĐ</td>
+                        </tr>
+                    <?php endforeach;?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </main>
+<script>
+    $("#selectQuery").change(function () {
+        queryData();
+    });
+    $("#amountOrder").change(function () {
+        queryData();
+    });
+    $("#monthQuery").change(function () {
+        queryData();
+    });
+    function queryData(){
+        var selectQuery = $("#selectQuery").val();
+        var amountOrder = $("#amountOrder").val();
+        var monthQuery = $("#monthQuery").val();
+        $.ajax({
+            url: "https://vutt94.io.vn/library/api/api_analytics.php",
+            type: "POST",
+            data:{
+                selectQuery: selectQuery,
+                monthQuery: monthQuery,
+                amountOrder: amountOrder,
+            }, success: function(data){
+                if (data.length > 0){
+                    $("#analytic-list").empty();
+                    $.each(data,function (key,value) {
+                        if (value.borrow_date != null){
+                            var row = $("<tr></tr>");
+                            row.append("<td>" + convertDateFormat(value.borrow_date) + "</td>");
+                            row.append("<td>" + value.num_borrow + "</td>");
+                            row.append("<td>" + Number(value.total_fine).toLocaleString('en-US') + " VNĐ</td>");
+                        } else if (value.month != null){
+                            var row = $("<tr></tr>");
+                            row.append("<td>Tháng " + value.month.toString() + "/" + value.year.toString() + "</td>");
+                            row.append("<td>" + value.num_borrow + "</td>");
+                            row.append("<td>" + Number(value.total_fine).toLocaleString('en-US') + " VNĐ</td>");
+                        }
+                        $("#analytic-list").append(row);
+                    });
+                } else {
+                    $("#analytic-list").empty();
+                    $("#analytic-list").append("<tr><td colspan='3' style='text-align: center;font-weight: bold'>Không có dữ liệu đang tìm.</td></tr>");
+                }
+            }, error: function(error) {
+                console.log(error.message);
+            }
+        });
+    }
+    function convertDateFormat(borrow_date){
+        let date = new Date(borrow_date);
+        let day = date.getDate();
+        let month = date.getMonth() + 1; // January is 0!
+        let year = date.getFullYear();
+
+        day = day.toString().padStart(2, '0');
+        month = month.toString().padStart(2, '0');
+
+        return day + "/" + month + "/" + year;
+    }
+</script>
 <?php include 'foot.php'?>
